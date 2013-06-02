@@ -8,6 +8,44 @@
 	xmlns:p="http://primefaces.org/ui">
 <h:head></h:head>
 <h:body>
-	<p:spinner />
+
+
+    <p:growl id="messages" showDetail="true"/> 
+	<div style="width: 500px; margin: auto;">
+		<h:form enctype="multipart/form-data">
+			<p:fileUpload value="#{paginasBean.file}" mode="simple"  update="messages" />
+			<br />
+			<p:fileUpload value="#{paginasBean.audio}" mode="simple" update="messages" />
+			<br />
+			<h:inputTextarea cols="50" rows="5" label="Descrição"
+				value="#{paginasBean.texto}"></h:inputTextarea>
+			<br />
+			<p:commandButton action="#{paginasBean.submit}" value="Submit"
+				ajax="false" />
+		</h:form>
+	</div>
+
+	<div style="width: 500px; margin: auto; margin-top: 20px;">
+		<p:galleria id="contentGalleria" showCaption="true" panelWidth="500"
+			panelHeight="400" frameWidth="40" frameHeight="50" effect="clip"
+			autoPlay="false" value="#{paginasBean.paginas}" var="pagina">
+			
+			<p:graphicImage rendered="#{not empty pagina.urlImagem}" value="/images/#{pagina.urlImagem}" width="500"
+				height="400" alt="#{pagina.texto}" title="" />
+				
+			<p:graphicImage rendered="#{empty pagina.urlImagem}" value="/images/no_image.gif" width="500"
+				height="400" alt="#{pagina.texto}" title="" />
+			<div>
+			<p:media value="/media/#{pagina.urlSom}" width="500" height="200"
+						player="quicktime" >
+			</p:media>
+			</div>
+
+		</p:galleria>
+
+	</div>
+
+
+
 </h:body>
 </html>
