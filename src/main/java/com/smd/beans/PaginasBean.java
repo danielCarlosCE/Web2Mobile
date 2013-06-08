@@ -7,11 +7,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.servlet.ServletContext;
 
 import org.primefaces.model.UploadedFile;
 
@@ -21,41 +23,108 @@ import com.smd.model.Pagina;
 @SessionScoped
 public class PaginasBean {
 
-	private List<Pagina> paginas;
-	private final String destination = "/Users/danielcarlos/Documents/Development/workspace/JavaEE/Web2Mobile/src/main/webapp/";
-	private UploadedFile file;
+	private List<Pagina> paginas = new ArrayList<Pagina>();;
+	private UploadedFile imagem;
 	private UploadedFile audio;
 	private String texto;
+	private Pagina paginaAtual = new Pagina();
 
 	public PaginasBean() {
+		paginaAtual.setUrlImagem("no_image.gif");
+		paginaAtual.setUrlSom("02 Ill Be Waiting.mp3");
+		paginaAtual.setTexto("Texto Descrição");
+	}
 
+	public String novaPagina() {
+		paginaAtual = new Pagina();
+		return submit();
+	}
+
+	public String deletar() {
+		paginas.remove(paginaAtual);
+		anterior();
+		return "sucesso";
+	}
+
+	public String anterior() {
+		imagem = null;
+		audio = null;
+		texto = null;
+
+		ListIterator<Pagina> listIterator = paginas.listIterator();
+
+		int indexOf = paginas.indexOf(paginaAtual);
+		Pagina next = new Pagina();
+		for (int i = 0; i < indexOf + 1; i++) {
+			next = listIterator.next();
+		}
+		if (listIterator.hasPrevious()) {
+			next = listIterator.previous();
+		}
+		if (listIterator.hasPrevious()) {
+			next = listIterator.previous();
+			paginaAtual = next;
+			System.out.println("anterior" + next.getTexto());
+		}
+		return "sucesso";
+	}
+
+	public String proxima() {
+		imagem = null;
+		audio = null;
+		texto = null;
+		ListIterator<Pagina> listIterator = paginas.listIterator();
+		int indexOf = paginas.indexOf(paginaAtual);
+		Pagina next = new Pagina();
+		for (int i = 0; i < indexOf + 1; i++) {
+			next = listIterator.next();
+		}
+		if (listIterator.hasNext()) {
+			next = listIterator.next();
+			paginaAtual = next;
+			System.out.println("proxima" + next.getTexto());
+		}
+		return "sucesso";
 	}
 
 	public String submit() {
 		try {
-			Pagina p = new Pagina();
-			p.setTexto(texto);
-			if (file != null) {
-				copyFile("/images/"+file.getFileName(), file.getInputstream());
-				FacesMessage msg = new FacesMessage("Sucesso", file.getFileName()
-						+ " foi adicionado.");
+
+			ServletContext servletContext = (ServletContext) FacesContext
+					.getCurrentInstance().getExternalContext().getContext();
+			String webRoot = servletContext.getRealPath(File.separator);
+			// if(!new File(webRoot+File.separator+"media").exists()){
+			// new File(webRoot+File.separator+"media").mkdir();
+			// }
+
+			System.out.println(webRoot);
+			if (texto != null) {
+				paginaAtual.setTexto(texto);
+			}
+			if (imagem != null) {
+				System.out.println("imagem nao eh nula");
+				copyFile(webRoot + File.separator + "images" + File.separator
+						+ imagem.getFileName(), imagem.getInputstream());
+				FacesMessage msg = new FacesMessage("Sucesso",
+						imagem.getFileName() + " foi adicionado.");
 				FacesContext.getCurrentInstance().addMessage(null, msg);
-				p.setUrlImagem(file.getFileName());
+				paginaAtual.setUrlImagem(imagem.getFileName());
+				System.out.println("urlImagem: " + paginaAtual.getUrlImagem());
 			}
 			if (audio != null) {
-				copyFile("/media/"+audio.getFileName(), audio.getInputstream());
-				FacesMessage msg = new FacesMessage("Sucesso", audio.getFileName()
-						+ " foi adicionado.");
+				copyFile(webRoot + File.separator + "media" + File.separator
+						+ audio.getFileName(), audio.getInputstream());
+				FacesMessage msg = new FacesMessage("Sucesso",
+						audio.getFileName() + " foi adicionado.");
 				FacesContext.getCurrentInstance().addMessage(null, msg);
-				
-				p.setUrlSom(audio.getFileName());
+
+				paginaAtual.setUrlSom(audio.getFileName());
+				System.out.println("urlSom: " + paginaAtual.getUrlSom());
 			}
-			
-			if (paginas == null) {
-				System.out.println("paginas null");
-				paginas = new ArrayList<Pagina>();
+			if (!paginas.contains(paginaAtual)) {
+				System.out.println("nao contem");
+				paginas.add(paginaAtual);
 			}
-			paginas.add(p);
 			return "sucesso";
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -66,8 +135,7 @@ public class PaginasBean {
 	public void copyFile(String fileName, InputStream in) {
 		try {
 
-			OutputStream out = new FileOutputStream(new File(destination + "/"
-					+ fileName));
+			OutputStream out = new FileOutputStream(new File(fileName));
 
 			int read = 0;
 
@@ -101,12 +169,12 @@ public class PaginasBean {
 		this.paginas = paginas;
 	}
 
-	public UploadedFile getFile() {
-		return file;
+	public UploadedFile getImagem() {
+		return imagem;
 	}
 
-	public void setFile(UploadedFile file) {
-		this.file = file;
+	public void setImagem(UploadedFile imagem) {
+		this.imagem = imagem;
 	}
 
 	public String getTexto() {
@@ -125,7 +193,12 @@ public class PaginasBean {
 		this.audio = audio;
 	}
 
+	public Pagina getPaginaAtual() {
+		return paginaAtual;
+	}
 
-	
-	
+	public void setPaginaAtual(Pagina paginaAtual) {
+		this.paginaAtual = paginaAtual;
+	}
+
 }

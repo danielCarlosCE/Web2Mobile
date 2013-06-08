@@ -6,46 +6,127 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:p="http://primefaces.org/ui">
-<h:head></h:head>
+<h:head>
+
+</h:head>
 <h:body>
+	<f:view encoding="ISO-8859-1">
+		<h:form>
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<h1 style="display: inline; margin: 10px; margin-left: 20px">Web2Mobile</h1>
+					<p:commandButton type="button" onclick="dlg2.show()" title="Nova"
+						icon="ui-icon-document" />
+					<p:commandButton type="button" onclick="dlg.show()" title="Editar"
+						icon="ui-icon-pencil" />
+				</p:toolbarGroup>
+			</p:toolbar>
 
+			<p:confirmDialog id="confirmDialog"
+				message="Você tem certeza que deseja deletar essa página?"
+				header="Deletar Página" severity="alert" widgetVar="confirmation">
 
-    <p:growl id="messages" showDetail="true"/> 
-	<div style="width: 500px; margin: auto;">
-		<h:form enctype="multipart/form-data">
-			<p:fileUpload value="#{paginasBean.file}" mode="simple"  update="messages" />
-			<br />
-			<p:fileUpload value="#{paginasBean.audio}" mode="simple" update="messages" />
-			<br />
-			<h:inputTextarea cols="50" rows="5" label="Descrição"
-				value="#{paginasBean.texto}"></h:inputTextarea>
-			<br />
-			<p:commandButton action="#{paginasBean.submit}" value="Submit"
-				ajax="false" />
+				<p:commandButton id="confirm" value="Confirmar"
+					oncomplete="confirmation.hide()" action="#{paginasBean.deletar}" />
+				<p:commandButton id="decline" value="Cancelar"
+					onclick="confirmation.hide()" type="button" />
+
+			</p:confirmDialog>
+
 		</h:form>
-	</div>
 
-	<div style="width: 500px; margin: auto; margin-top: 20px;">
-		<p:galleria id="contentGalleria" showCaption="true" panelWidth="500"
-			panelHeight="400" frameWidth="40" frameHeight="50" effect="clip"
-			autoPlay="false" value="#{paginasBean.paginas}" var="pagina">
-			
-			<p:graphicImage rendered="#{not empty pagina.urlImagem}" value="/images/#{pagina.urlImagem}" width="500"
-				height="400" alt="#{pagina.texto}" title="" />
-				
-			<p:graphicImage rendered="#{empty pagina.urlImagem}" value="/images/no_image.gif" width="500"
-				height="400" alt="#{pagina.texto}" title="" />
-			<div>
-			<p:media value="/media/#{pagina.urlSom}" width="500" height="200"
-						player="quicktime" >
-			</p:media>
+		<div style="width: 500px; margin: auto; margin-top: 20px;">
+
+			<h:form enctype="multipart/form-data">
+				<p:growl id="messages" showDetail="true" />
+
+				<!-- 				<h:outputLink id="editar" onclick="dlg.show()"> -->
+				<!-- 					<p:commandButton value="Editar" /> -->
+				<!-- 				</h:outputLink> -->
+
+				<p:dialog id="dialog" modal="true" header="Editar Página"
+					widgetVar="dlg" resizable="false">
+
+					<h:panelGrid columns="2" cellpadding="5">
+						<h:outputLabel for="imagem" value="Imagem:" />
+						<p:fileUpload id="imagem" value="#{paginasBean.imagem}"
+							mode="simple" />
+						<h:outputLabel for="audio" value="Audio:" />
+						<p:fileUpload value="#{paginasBean.audio}" mode="simple"
+							id="audio" />
+						<h:outputLabel for="texto" value="Texto:" />
+						<h:inputTextarea id="texto" cols="50" rows="5" label="Descrição"
+							value="#{paginasBean.texto}"></h:inputTextarea>
+						<f:facet name="footer">
+							<p:commandButton action="#{paginasBean.submit}" value="OK"
+								ajax="false" />
+						</f:facet>
+					</h:panelGrid>
+
+				</p:dialog>
+
+			</h:form>
+
+			<h:form enctype="multipart/form-data">
+				<p:growl id="messages" showDetail="true" />
+
+				<!-- 				<h:outputLink id="novaPagina" onclick="dlg2.show()"> -->
+				<!-- 					<p:commandButton icon="ui-icon-plusthick" value="Nova Página" /> -->
+				<!-- 				</h:outputLink> -->
+
+				<p:dialog id="dialog2" modal="true" header="Nova Página"
+					widgetVar="dlg2" resizable="false">
+
+					<h:panelGrid columns="2" cellpadding="5">
+						<h:outputLabel for="imagem2" value="Imagem:" />
+						<p:fileUpload id="imagem2" value="#{paginasBean.imagem}"
+							mode="simple" />
+						<h:outputLabel for="audio2" value="Audio:" />
+						<p:fileUpload value="#{paginasBean.audio}" mode="simple"
+							id="audio2" />
+						<h:outputLabel for="texto2" value="Texto:" />
+						<h:inputTextarea id="texto2" cols="50" rows="5" label="Descrição"
+							value="#{paginasBean.texto}"></h:inputTextarea>
+						<f:facet name="footer">
+							<p:commandButton action="#{paginasBean.novaPagina}" value="OK"
+								ajax="false" />
+						</f:facet>
+					</h:panelGrid>
+
+				</p:dialog>
+			</h:form>
+
+		</div>
+		<h:panelGroup rendered="#{not empty paginasBean.paginas}">
+			<div style="width: 550px; margin: auto;">
+				<p:panel>
+					<p:graphicImage
+						value="/images/#{paginasBean.paginaAtual.urlImagem}" width="500"
+						height="400" />=
+				</p:panel>
+				<p:panel>
+					<h:outputLabel value="#{paginasBean.paginaAtual.texto}"></h:outputLabel>
+					<br />
+
+				</p:panel>
+				<p:panel>
+					<audio controls="controls"> <source
+						src="media/#{paginasBean.paginaAtual.urlSom}" type="audio/mp3" />
+					</audio>
+				</p:panel>
+				<p:panel>
+					<h:form>
+						<p:commandButton action="#{paginasBean.anterior}" value="Anterior"
+							ajax="false" />
+						<p:commandButton action="#{paginasBean.proxima}" value="Próximo"
+							ajax="false" />
+
+					</h:form>
+				</p:panel>
+
 			</div>
+		</h:panelGroup>
 
-		</p:galleria>
-
-	</div>
-
-
-
+	</f:view>
 </h:body>
 </html>
