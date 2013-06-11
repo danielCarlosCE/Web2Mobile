@@ -7,18 +7,34 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:p="http://primefaces.org/ui">
 <h:head>
-
+	<style type="text/css">
+#imagemCentral {
+	border: 1px solid #dddddd;
+	padding: 2px;
+}
+</style>
 </h:head>
 <h:body>
 	<f:view encoding="ISO-8859-1">
 		<h:form>
 			<p:toolbar>
 				<p:toolbarGroup align="left">
-					<h1 style="display: inline; margin: 10px; margin-left: 20px">Web2Mobile</h1>
-					<p:commandButton type="button" onclick="dlg2.show()" title="Nova"
-						icon="ui-icon-document" />
-					<p:commandButton type="button" onclick="dlg.show()" title="Editar"
-						icon="ui-icon-pencil" />
+					<h1 style="display: inline; margin: 10px; margin-left: 20px">
+						Web2Mobile
+						<ui:fragment rendered="#{not empty paginasBean.nomeProjeto}">
+						- <h:outputLabel value="#{paginasBean.nomeProjeto}"></h:outputLabel>
+						</ui:fragment>
+					</h1>
+
+				</p:toolbarGroup>
+				<p:toolbarGroup align="right">
+					<ui:fragment rendered="#{not empty paginasBean.nomeProjeto}">
+
+						<p:commandButton type="button" onclick="dlg2.show()" title="Nova"
+							value="Nova" icon="ui-icon-document" />
+						<p:commandButton type="button" onclick="dlg.show()" title="Editar"
+							value="Editar" icon="ui-icon-pencil" />
+					</ui:fragment>
 				</p:toolbarGroup>
 			</p:toolbar>
 
@@ -34,15 +50,38 @@
 			</p:confirmDialog>
 
 		</h:form>
+		<div style="width: 300px; margin: auto;">
+			<h:panelGroup rendered="#{empty paginasBean.nomeProjeto}">
+				<h:form>
+					<h:outputLink onclick="novoProjetoDial.show()" ajax="false">
+						<p:commandButton icon="ui-icon-plusthick" value="Novo Projeto" />
+						<!-- 						<h:graphicImage value="/images/pages.png" width="90" height="90" /> -->
+					</h:outputLink>
+
+					<p:dialog modal="true" header="Novo Projeto"
+						widgetVar="novoProjetoDial" resizable="false">
+						<h:panelGrid columns="2" cellpadding="5">
+							<h:outputLabel for="nomeProjeto" value="Nome do projeto:" />
+							<h:inputText id="nomeProjeto" value="#{paginasBean.nomeProjeto}"
+								mode="simple" />
+							<f:facet name="footer">
+								<p:commandButton value="Criar"
+									action="#{paginasBean.novoProjeto}" ajax="false" />
+							</f:facet>
+						</h:panelGrid>
+					</p:dialog>
+
+				</h:form>
+			</h:panelGroup>
+		</div>
+
 
 		<div style="width: 500px; margin: auto; margin-top: 20px;">
 
+
+
 			<h:form enctype="multipart/form-data">
 				<p:growl id="messages" showDetail="true" />
-
-				<!-- 				<h:outputLink id="editar" onclick="dlg.show()"> -->
-				<!-- 					<p:commandButton value="Editar" /> -->
-				<!-- 				</h:outputLink> -->
 
 				<p:dialog id="dialog" modal="true" header="Editar Página"
 					widgetVar="dlg" resizable="false">
@@ -70,10 +109,6 @@
 			<h:form enctype="multipart/form-data">
 				<p:growl id="messages" showDetail="true" />
 
-				<!-- 				<h:outputLink id="novaPagina" onclick="dlg2.show()"> -->
-				<!-- 					<p:commandButton icon="ui-icon-plusthick" value="Nova Página" /> -->
-				<!-- 				</h:outputLink> -->
-
 				<p:dialog id="dialog2" modal="true" header="Nova Página"
 					widgetVar="dlg2" resizable="false">
 
@@ -100,28 +135,51 @@
 		<h:panelGroup rendered="#{not empty paginasBean.paginas}">
 			<div style="width: 550px; margin: auto;">
 				<p:panel>
+
 					<p:graphicImage
 						value="/images/#{paginasBean.paginaAtual.urlImagem}" width="500"
-						height="400" />=
+						height="400" id="imagemCentral" />
+					<table
+						style="margin: auto; border: 1px solid #dddddd; padding: 2px; margin-top: 2px;">
+						<tr>
+							<td colspan="3" style="text-align: center;"><h:outputLabel
+									value="#{paginasBean.indicePaginaAtual}/#{paginasBean.paginas.size()}"></h:outputLabel></td>
+						</tr>
+						<tr>
+							<h:form>
+								<td><p:commandLink ajax="false"
+										action="#{paginasBean.anterior}">
+										<h:graphicImage
+											value="/images/#{paginasBean.paginaAnterior.urlImagem}"
+											width="70" height="60" />
+									</p:commandLink></td>
+								<ui:fragment rendered="#{paginasBean.contemAnterior}">
+									<td><h:graphicImage
+											value="/images/#{paginasBean.paginaAtual.urlImagem}"
+											width="70" height="60" /></td>
+								</ui:fragment>
+								<ui:fragment rendered="#{paginasBean.contemProxima}">
+									<td><p:commandLink ajax="false"
+											action="#{paginasBean.proxima}">
+											<h:graphicImage
+												value="/images/#{paginasBean.proximaPagina.urlImagem}"
+												width="70" height="60" />
+										</p:commandLink></td>
+								</ui:fragment>
+
+							</h:form>
+						</tr>
+					</table>
 				</p:panel>
 				<p:panel>
 					<h:outputLabel value="#{paginasBean.paginaAtual.texto}"></h:outputLabel>
-					<br />
-
 				</p:panel>
 				<p:panel>
-					<audio controls="controls"> <source
-						src="media/#{paginasBean.paginaAtual.urlSom}" type="audio/mp3" />
-					</audio>
-				</p:panel>
-				<p:panel>
-					<h:form>
-						<p:commandButton action="#{paginasBean.anterior}" value="Anterior"
-							ajax="false" />
-						<p:commandButton action="#{paginasBean.proxima}" value="Próximo"
-							ajax="false" />
-
-					</h:form>
+					<div style="width: 300px; margin: auto;">
+						<audio controls="controls"> <source
+							src="media/#{paginasBean.paginaAtual.urlSom}" type="audio/mp3" />
+						</audio>
+					</div>
 				</p:panel>
 
 			</div>

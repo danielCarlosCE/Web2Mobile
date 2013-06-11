@@ -23,6 +23,7 @@ import com.smd.model.Pagina;
 @SessionScoped
 public class PaginasBean {
 
+	private String nomeProjeto;
 	private List<Pagina> paginas = new ArrayList<Pagina>();;
 	private UploadedFile imagem;
 	private UploadedFile audio;
@@ -30,14 +31,15 @@ public class PaginasBean {
 	private Pagina paginaAtual = new Pagina();
 
 	public PaginasBean() {
-		paginaAtual.setUrlImagem("no_image.gif");
-		paginaAtual.setUrlSom("02 Ill Be Waiting.mp3");
-		paginaAtual.setTexto("Texto Descrição");
 	}
 
 	public String novaPagina() {
 		paginaAtual = new Pagina();
 		return submit();
+	}
+
+	public String novoProjeto() {
+		return "sucesso";
 	}
 
 	public String deletar() {
@@ -46,26 +48,87 @@ public class PaginasBean {
 		return "sucesso";
 	}
 
+	public int getIndicePaginaAtual() {
+		return paginas.indexOf(paginaAtual) + 1;
+	}
+
+	public boolean isContemAnterior() {
+		Pagina anterior = new Pagina();
+		ListIterator<Pagina> listIterator = paginas.listIterator();
+		int indexOf = paginas.indexOf(paginaAtual);
+		for (int i = 0; i < indexOf + 1; i++) {
+			anterior = listIterator.next();
+		}
+		if (listIterator.hasPrevious()) {
+			anterior = listIterator.previous();
+		}
+		if (listIterator.hasPrevious()) {
+			anterior = listIterator.previous();
+			System.out.println("anterior" + anterior.getTexto());
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean isContemProxima() {
+		ListIterator<Pagina> listIterator = paginas.listIterator();
+		int indexOf = paginas.indexOf(paginaAtual);
+		Pagina proxima = new Pagina();
+		for (int i = 0; i < indexOf + 1; i++) {
+			proxima = listIterator.next();
+		}
+		if (listIterator.hasNext()) {
+			proxima = listIterator.next();
+			System.out.println("proxima" + proxima.getTexto());
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public Pagina getPaginaAnterior() {
+		Pagina anterior = new Pagina();
+		ListIterator<Pagina> listIterator = paginas.listIterator();
+		int indexOf = paginas.indexOf(paginaAtual);
+		for (int i = 0; i < indexOf + 1; i++) {
+			anterior = listIterator.next();
+		}
+		if (listIterator.hasPrevious()) {
+			anterior = listIterator.previous();
+		}
+		if (listIterator.hasPrevious()) {
+			anterior = listIterator.previous();
+			System.out.println("anterior" + anterior.getTexto());
+		} else {
+			anterior = paginaAtual;
+		}
+		return anterior;
+	}
+
+	public Pagina getProximaPagina() {
+		ListIterator<Pagina> listIterator = paginas.listIterator();
+		int indexOf = paginas.indexOf(paginaAtual);
+		Pagina proxima = new Pagina();
+		for (int i = 0; i < indexOf + 1; i++) {
+			proxima = listIterator.next();
+		}
+		if (listIterator.hasNext()) {
+			proxima = listIterator.next();
+			System.out.println("proxima" + proxima.getTexto());
+		} else {
+			proxima = paginaAtual;
+		}
+		return proxima;
+	}
+
 	public String anterior() {
 		imagem = null;
 		audio = null;
 		texto = null;
 
-		ListIterator<Pagina> listIterator = paginas.listIterator();
+		paginaAtual = getPaginaAnterior();
 
-		int indexOf = paginas.indexOf(paginaAtual);
-		Pagina next = new Pagina();
-		for (int i = 0; i < indexOf + 1; i++) {
-			next = listIterator.next();
-		}
-		if (listIterator.hasPrevious()) {
-			next = listIterator.previous();
-		}
-		if (listIterator.hasPrevious()) {
-			next = listIterator.previous();
-			paginaAtual = next;
-			System.out.println("anterior" + next.getTexto());
-		}
 		return "sucesso";
 	}
 
@@ -73,17 +136,9 @@ public class PaginasBean {
 		imagem = null;
 		audio = null;
 		texto = null;
-		ListIterator<Pagina> listIterator = paginas.listIterator();
-		int indexOf = paginas.indexOf(paginaAtual);
-		Pagina next = new Pagina();
-		for (int i = 0; i < indexOf + 1; i++) {
-			next = listIterator.next();
-		}
-		if (listIterator.hasNext()) {
-			next = listIterator.next();
-			paginaAtual = next;
-			System.out.println("proxima" + next.getTexto());
-		}
+
+		paginaAtual = getProximaPagina();
+
 		return "sucesso";
 	}
 
@@ -199,6 +254,14 @@ public class PaginasBean {
 
 	public void setPaginaAtual(Pagina paginaAtual) {
 		this.paginaAtual = paginaAtual;
+	}
+
+	public String getNomeProjeto() {
+		return nomeProjeto;
+	}
+
+	public void setNomeProjeto(String nomeProjeto) {
+		this.nomeProjeto = nomeProjeto;
 	}
 
 }
