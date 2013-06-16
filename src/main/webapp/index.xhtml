@@ -22,9 +22,15 @@
 					<h1 style="display: inline; margin: 10px; margin-left: 20px">
 						Web2Mobile
 						<ui:fragment rendered="#{not empty paginasBean.nomeProjeto}">
-						- <h:outputLabel value="#{paginasBean.nomeProjeto}"></h:outputLabel>
+							<h:outputLabel value=" - #{paginasBean.nomeProjeto}"></h:outputLabel>
 						</ui:fragment>
 					</h1>
+					<ui:fragment rendered="#{not empty paginasBean.paginas}">
+
+						<p:commandButton type="button" value="Finalizar Projeto"
+							ajax="false" action="#{paginasBean.finalizarProjeto}" />
+
+					</ui:fragment>
 
 				</p:toolbarGroup>
 				<p:toolbarGroup align="right">
@@ -32,8 +38,12 @@
 
 						<p:commandButton type="button" onclick="dlg2.show()" title="Nova"
 							value="Nova" icon="ui-icon-document" />
+					</ui:fragment>
+					<ui:fragment rendered="#{not empty paginasBean.paginas}">
 						<p:commandButton type="button" onclick="dlg.show()" title="Editar"
 							value="Editar" icon="ui-icon-pencil" />
+						<p:commandButton type="button" onclick="confirmation.show()"
+							title="Deletar" value="Deletar" icon="ui-icon-pencil" />
 					</ui:fragment>
 				</p:toolbarGroup>
 			</p:toolbar>
@@ -42,7 +52,7 @@
 				message="Você tem certeza que deseja deletar essa página?"
 				header="Deletar Página" severity="alert" widgetVar="confirmation">
 
-				<p:commandButton id="confirm" value="Confirmar"
+				<p:commandButton id="confirm" value="Confirmar" ajax="false"
 					oncomplete="confirmation.hide()" action="#{paginasBean.deletar}" />
 				<p:commandButton id="decline" value="Cancelar"
 					onclick="confirmation.hide()" type="button" />
@@ -50,13 +60,23 @@
 			</p:confirmDialog>
 
 		</h:form>
-		<div style="width: 300px; margin: auto;">
+		<div style="width: 600px; margin: auto; margin-top: 30;">
 			<h:panelGroup rendered="#{empty paginasBean.nomeProjeto}">
 				<h:form>
-					<h:outputLink onclick="novoProjetoDial.show()" ajax="false">
-						<p:commandButton icon="ui-icon-plusthick" value="Novo Projeto" />
-						<!-- 						<h:graphicImage value="/images/pages.png" width="90" height="90" /> -->
-					</h:outputLink>
+					<p:panel header="Novo projeto">
+						<h:outputText
+							value="
+						Olá, o web2mobile é um sistema web para criação de conteúdo multimídia. O que for feito aqui será transformado em conteúdo para dispositivos android.
+						Um projeto consiste em uma ou mais páginas e cada página pode conter imagem, audio e texto. 
+						Você poderá criar novas páginas, editar as que já criou e navegar entre elas. 
+						Ao finalizar seu projeto clique em 'Finalizar Projeto' na parte superior da tela, fazendo isso o conteúdo será exportado para dispositivos android." />
+						<f:facet name="footer">
+							<h:outputLink onclick="novoProjetoDial.show()" ajax="false">
+								<p:commandButton icon="ui-icon-plusthick" value="Novo Projeto" />
+								<!-- <h:graphicImage value="/images/pages.png" width="90" height="90" /> -->
+							</h:outputLink>
+						</f:facet>
+					</p:panel>
 
 					<p:dialog modal="true" header="Novo Projeto"
 						widgetVar="novoProjetoDial" resizable="false">
@@ -147,14 +167,25 @@
 						</tr>
 						<tr>
 							<h:form>
-								<td><p:commandLink ajax="false"
-										action="#{paginasBean.anterior}">
-										<h:graphicImage
-											value="/images/#{paginasBean.paginaAnterior.urlImagem}"
-											width="70" height="60" />
-									</p:commandLink></td>
 								<ui:fragment rendered="#{paginasBean.contemAnterior}">
-									<td><h:graphicImage
+									<td><p:commandLink ajax="false"
+											action="#{paginasBean.anterior}">
+											<h:graphicImage
+												value="/images/#{paginasBean.paginaAnterior.urlImagem}"
+												width="70" height="60" />
+										</p:commandLink></td>
+								</ui:fragment>
+								<ui:fragment rendered="#{not paginasBean.contemAnterior}">
+									<td style="border: 5px solid #69f;"><p:commandLink
+											ajax="false" action="#{paginasBean.anterior}">
+											<h:graphicImage
+												value="/images/#{paginasBean.paginaAnterior.urlImagem}"
+												width="70" height="60" />
+										</p:commandLink></td>
+								</ui:fragment>
+
+								<ui:fragment rendered="#{paginasBean.contemAnterior}">
+									<td style="border: 5px solid #69f;"><h:graphicImage
 											value="/images/#{paginasBean.paginaAtual.urlImagem}"
 											width="70" height="60" /></td>
 								</ui:fragment>

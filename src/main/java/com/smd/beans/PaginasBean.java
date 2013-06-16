@@ -33,18 +33,29 @@ public class PaginasBean {
 	public PaginasBean() {
 	}
 
+	public String finalizarProjeto(){
+		return "sucesso";
+	}
+	
 	public String novaPagina() {
 		paginaAtual = new Pagina();
 		return submit();
 	}
-
+	
 	public String novoProjeto() {
 		return "sucesso";
 	}
 
 	public String deletar() {
+		Pagina temp = getPaginaAnterior();
+		if(temp==paginaAtual){
+			temp = getProximaPagina();
+			if(temp==paginaAtual){
+				temp = null;
+			}
+		}
 		paginas.remove(paginaAtual);
-		anterior();
+		paginaAtual = temp;
 		return "sucesso";
 	}
 
@@ -148,9 +159,6 @@ public class PaginasBean {
 			ServletContext servletContext = (ServletContext) FacesContext
 					.getCurrentInstance().getExternalContext().getContext();
 			String webRoot = servletContext.getRealPath(File.separator);
-			// if(!new File(webRoot+File.separator+"media").exists()){
-			// new File(webRoot+File.separator+"media").mkdir();
-			// }
 
 			System.out.println(webRoot);
 			if (texto != null) {
