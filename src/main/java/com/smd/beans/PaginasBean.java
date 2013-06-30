@@ -1,10 +1,14 @@
 package com.smd.beans;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -18,6 +22,7 @@ import javax.servlet.ServletContext;
 import org.primefaces.model.UploadedFile;
 
 import com.smd.model.Pagina;
+import com.smd.model.ZipCompressor;
 
 @ManagedBean
 @SessionScoped
@@ -34,6 +39,65 @@ public class PaginasBean {
 	}
 
 	public String finalizarProjeto(){
+		System.out.println("entrou no metodo finalizar");
+		ServletContext servletContext = (ServletContext) FacesContext
+				.getCurrentInstance().getExternalContext().getContext();
+		String webRoot = servletContext.getRealPath(File.separator);		
+		
+		try {
+			new File(nomeProjeto + File.separator + "Audios").mkdirs();
+			
+			ZipCompressor zip = new ZipCompressor();
+			zip.createZip(nomeProjeto + ".zip");
+						
+			PrintWriter xml = new PrintWriter(nomeProjeto + File.separator + 
+					nomeProjeto + ".xml");
+			xml.println("<quadrinho nome=\"" + nomeProjeto + "\">");
+			int telaNum = 1;
+			for (Pagina pagina : paginas) {
+				xml.println("<tela id=\"" + telaNum + "\">");
+				
+				copyFile(new File(webRoot + File.separator 
+						+ "images" + File.separator + pagina.getUrlImagem()), 
+						new File(nomeProjeto + File.separator + pagina.getUrlImagem()));
+				zip.addFile(nomeProjeto + File.separator + pagina.getUrlImagem());
+				xml.println("<imagem src=\"" + pagina.getUrlImagem() + "\"/>");
+				
+				copyFile(new File(webRoot + File.separator + 
+						"media" + File.separator + pagina.getUrlSom()), 
+						new File(nomeProjeto + File.separator + 
+								"Audios" + File.separator + pagina.getUrlSom()));
+				zip.addFile(nomeProjeto + File.separator + "Audios" + 
+								File.separator + pagina.getUrlSom());
+				xml.println("<audio src=\"" + pagina.getUrlSom() + "\"/>");
+				
+				xml.println("<texto txt=\"" + pagina.getTexto() + "\"/>");
+				
+				xml.println("</tela>");
+				telaNum++;
+			}
+			
+			xml.print("</quadrinho>");
+			xml.close();
+			
+			zip.addFile(nomeProjeto + File.separator + 
+					nomeProjeto + ".xml");
+			zip.generateZip();
+			
+			FacesMessage msg = new FacesMessage("Sucesso", "Projeto exportado para ...");
+			FacesContext.getCurrentInstance().addMessage(null, msg);
+			
+			new File(webRoot + File.separator + "resources").mkdir();
+			copyFile(new File(nomeProjeto + ".zip"), 
+					new File(webRoot + File.separator + "resources" + File.separator + 
+					nomeProjeto + ".zip"));
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		return "sucesso";
 	}
 	
@@ -220,6 +284,26 @@ public class PaginasBean {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void copyFile(File source, File destination) throws IOException {     
+	     if (destination.exists())     
+	         destination.delete();     
+	    
+	     FileChannel sourceChannel = null;     
+	     FileChannel destinationChannel = null;     
+	    
+	     try {     
+	         sourceChannel = new FileInputStream(source).getChannel();     
+	         destinationChannel = new FileOutputStream(destination).getChannel();     
+	         sourceChannel.transferTo(0, sourceChannel.size(),     
+	                 destinationChannel);     
+	     } finally {     
+	         if (sourceChannel != null && sourceChannel.isOpen())     
+	             sourceChannel.close();     
+	         if (destinationChannel != null && destinationChannel.isOpen())     
+	             destinationChannel.close();     
+	    }     
 	}
 
 	public List<Pagina> getPaginas() {
