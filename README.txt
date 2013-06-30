@@ -13,6 +13,12 @@ Servidor:
 ================
 No eclipse instale os plugins necessários e adicione o Tomcat7 como servidor
 
+É necessário apontar para a pasta do jdk instalado em windows/preferences installed JREs e edite o local,
+aponte para a pasta do jdk ao invés da pasta do jre.
+
+Edite as propriedades do tomcat, clicando 2x nele, e coloque pra que o eclipse use o servidor de fato (segunda opção dos
+radios buttons).
+
 Nas pasta Server criada pelo eclipse edite o xml tomcat-users.xml, adicione as seguintes linhas dentro
 da tag <tomcat-users> </tomcat-users>:
 
