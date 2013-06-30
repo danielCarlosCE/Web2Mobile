@@ -48,7 +48,7 @@ public class PaginasBean {
 			new File(nomeProjeto + File.separator + "Audios").mkdirs();
 			
 			ZipCompressor zip = new ZipCompressor();
-			zip.createZip(nomeProjeto + ".zip");
+			zip.createZip(nomeProjeto + File.separator + nomeProjeto + ".zip");
 						
 			PrintWriter xml = new PrintWriter(nomeProjeto + File.separator + 
 					nomeProjeto + ".xml");
@@ -57,19 +57,25 @@ public class PaginasBean {
 			for (Pagina pagina : paginas) {
 				xml.println("<tela id=\"" + telaNum + "\">");
 				
-				copyFile(new File(webRoot + File.separator 
-						+ "images" + File.separator + pagina.getUrlImagem()), 
-						new File(nomeProjeto + File.separator + pagina.getUrlImagem()));
-				zip.addFile(nomeProjeto + File.separator + pagina.getUrlImagem());
-				xml.println("<imagem src=\"" + pagina.getUrlImagem() + "\"/>");
+				if(pagina.getUrlImagem() != null)
+				{
+					copyFile(new File(webRoot + File.separator 
+							+ "images" + File.separator + pagina.getUrlImagem()), 
+							new File(nomeProjeto + File.separator + pagina.getUrlImagem()));
+					zip.addFile(nomeProjeto + File.separator + pagina.getUrlImagem());
+					xml.println("<imagem src=\"" + pagina.getUrlImagem() + "\"/>");
+				}
 				
-				copyFile(new File(webRoot + File.separator + 
-						"media" + File.separator + pagina.getUrlSom()), 
-						new File(nomeProjeto + File.separator + 
-								"Audios" + File.separator + pagina.getUrlSom()));
-				zip.addFile(nomeProjeto + File.separator + "Audios" + 
-								File.separator + pagina.getUrlSom());
-				xml.println("<audio src=\"" + pagina.getUrlSom() + "\"/>");
+				if(pagina.getUrlSom() != null)
+				{
+					copyFile(new File(webRoot + File.separator + 
+							"media" + File.separator + pagina.getUrlSom()), 
+							new File(nomeProjeto + File.separator + 
+									"Audios" + File.separator + pagina.getUrlSom()));
+					zip.addFile(nomeProjeto + File.separator + "Audios" + 
+									File.separator + pagina.getUrlSom());
+					xml.println("<audio src=\"" + pagina.getUrlSom() + "\"/>");
+				}
 				
 				xml.println("<texto txt=\"" + pagina.getTexto() + "\"/>");
 				
@@ -84,11 +90,11 @@ public class PaginasBean {
 					nomeProjeto + ".xml");
 			zip.generateZip();
 			
-			FacesMessage msg = new FacesMessage("Sucesso", "Projeto exportado para ...");
+			FacesMessage msg = new FacesMessage("Sucesso", "Projeto exportado");
 			FacesContext.getCurrentInstance().addMessage(null, msg);
 			
 			new File(webRoot + File.separator + "resources").mkdir();
-			copyFile(new File(nomeProjeto + ".zip"), 
+			copyFile(new File(nomeProjeto + File.separator + nomeProjeto + ".zip"), 
 					new File(webRoot + File.separator + "resources" + File.separator + 
 					nomeProjeto + ".zip"));
 			
