@@ -258,6 +258,8 @@ public class PaginasBean {
 				System.out.println("nao contem");
 				paginas.add(paginaAtual);
 			}
+			texto = null;
+			
 			return "sucesso";
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
