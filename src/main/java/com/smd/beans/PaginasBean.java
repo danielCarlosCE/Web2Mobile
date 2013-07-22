@@ -50,8 +50,8 @@ public class PaginasBean {
 			ZipCompressor zip = new ZipCompressor();
 			zip.createZip(nomeProjeto + File.separator + nomeProjeto + ".zip");
 						
-			PrintWriter xml = new PrintWriter(nomeProjeto + File.separator + 
-					nomeProjeto + ".xml");
+			PrintWriter xml = new PrintWriter(new File(nomeProjeto + File.separator + 
+					nomeProjeto + ".xml"),"UTF-8");
 			xml.println("<quadrinho nome=\"" + nomeProjeto + "\">");
 			int telaNum = 1;
 			for (Pagina pagina : paginas) {
@@ -103,7 +103,9 @@ public class PaginasBean {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		nomeProjeto = null;
+		paginaAtual=new Pagina();
+		paginas = new ArrayList<Pagina>();
 		return "sucesso";
 	}
 	
